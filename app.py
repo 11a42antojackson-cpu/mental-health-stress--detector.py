@@ -4,12 +4,13 @@ import re, nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+# --- Ensure required NLTK resources are available ---
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
 
-# Load saved model and vectorizer
-model = joblib.load("model_rf.pkl") if False else joblib.load("best_model.pkl")  # use your logistic model if saved as best_model.pkl
+# --- Load model and vectorizer ---
+model = joblib.load("best_model.pkl")
 tfidf = joblib.load("tfidf.pkl")
 
 # Preprocessing
