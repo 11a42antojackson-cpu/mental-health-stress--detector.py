@@ -1,4 +1,6 @@
- app.py
-best_model.pkl
- tfidf.pkl
-requirements.txt
+streamlit
+scikit-learn
+nltk
+joblib
+numpy
+pandas
