@@ -3,11 +3,14 @@ import joblib
 import re, nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+import nltk
 
-# --- Ensure required NLTK resources are available ---
+# --- Ensure all required NLTK data is available ---
 nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)  # 🔥 NEW fix for latest NLTK
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
+
 
 # --- Load model and vectorizer ---
 model = joblib.load("best_model.pkl")
