@@ -43,18 +43,35 @@ if st.button("🔍 Analyze"):
 
         # --- Get class probabilities correctly ---
         probs = model.predict_proba(vectorized_input)[0]
-        stressed_index = list(model.classes_).index(1)  # find which column = 'stressed'
+        stressed_index = list(model.classes_).index(1)
         prob = probs[stressed_index]
         pred = model.predict(vectorized_input)[0]
 
         # --- Adjust confidence levels ---
         if pred == 1:
-            # Stressed → lower confidence (realistic)
-            adjusted_conf = (prob * 60) + 20   # ~20–80%
+            # 😞 Stressed → lower confidence (25%–50%)
+            adjusted_conf = 25 + (prob * 25)
             st.error(f"😞 **Stressed** (Confidence: {adjusted_conf:.2f}%)")
+
+            # Red progress bar for stressed
+            st.markdown(
+                f"""
+                <div style='background-color:#ff4b4b;width:{adjusted_conf}%;height:20px;border-radius:10px'></div>
+                """,
+                unsafe_allow_html=True,
+            )
+
         else:
-            # Not Stressed → higher confidence
-            adjusted_conf = (100 - prob * 50)  # ~75–100%
+            # 😊 Not Stressed → higher confidence (90%–100%)
+            adjusted_conf = 90 + (prob * 10)
             st.success(f"😊 **Not Stressed** (Confidence: {adjusted_conf:.2f}%)")
+
+            # Green progress bar for not stressed
+            st.markdown(
+                f"""
+                <div style='background-color:#00c853;width:{adjusted_conf}%;height:20px;border-radius:10px'></div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 st.caption("⚙️ Model: Random Forest Classifier | Features: TF-IDF (Bigrams)")
