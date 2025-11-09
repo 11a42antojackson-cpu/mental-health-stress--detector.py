@@ -1,6 +1,8 @@
-mental-health-stress-detector/
-│
-├── app.py
-├── best_model.pkl
-├── tfidf.pkl
-└── requirements.txt
+streamlit
+scikit-learn
+nltk
+joblib
+pandas
+numpy
+
+# rebuild app
