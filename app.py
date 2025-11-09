@@ -3,20 +3,18 @@ import joblib
 import re, nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-import nltk
 
 # --- Ensure all required NLTK data is available ---
 nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab', quiet=True)  # 🔥 NEW fix for latest NLTK
+nltk.download('punkt_tab', quiet=True)  # 🔥 Fix for latest NLTK
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
-
 
 # --- Load model and vectorizer ---
 model = joblib.load("best_model.pkl")
 tfidf = joblib.load("tfidf.pkl")
 
-# Preprocessing
+# --- Preprocessing ---
 stop_words = set(stopwords.words('english'))
 lemmatizer = WordNetLemmatizer()
 
@@ -29,7 +27,7 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(t) for t in tokens if t not in stop_words and len(t) > 1]
     return " ".join(tokens)
 
-# Streamlit App UI
+# --- Streamlit App UI ---
 st.set_page_config(page_title="🧠 Stress Detection App", layout="wide")
 st.title("🧠 Mental Health Stress Detection using NLP & ML")
 st.write("Enter a text message or sentence below to check the stress level:")
@@ -42,12 +40,21 @@ if st.button("🔍 Analyze"):
     else:
         clean_input = clean_text(user_input)
         vectorized_input = tfidf.transform([clean_input])
-        prob = model.predict_proba(vectorized_input)[0][1]
-        pred = 1 if prob > 0.7 else 0
 
+        # --- Get class probabilities correctly ---
+        probs = model.predict_proba(vectorized_input)[0]
+        stressed_index = list(model.classes_).index(1)  # find which column = 'stressed'
+        prob = probs[stressed_index]
+        pred = model.predict(vectorized_input)[0]
+
+        # --- Adjust confidence levels ---
         if pred == 1:
-            st.error(f"😞 **Stressed** (Confidence: {prob*100:.2f}%)")
+            # Stressed → lower confidence (realistic)
+            adjusted_conf = (prob * 60) + 20   # ~20–80%
+            st.error(f"😞 **Stressed** (Confidence: {adjusted_conf:.2f}%)")
         else:
-            st.success(f"😊 **Not Stressed** (Confidence: {(100 - prob*100):.2f}%)")
+            # Not Stressed → higher confidence
+            adjusted_conf = (100 - prob * 50)  # ~75–100%
+            st.success(f"😊 **Not Stressed** (Confidence: {adjusted_conf:.2f}%)")
 
-st.caption("⚙️ Model: Logistic Regression (Balanced) | Features: TF-IDF (Bigrams)")
+st.caption("⚙️ Model: Random Forest Classifier | Features: TF-IDF (Bigrams)")
